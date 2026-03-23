@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consentimiento de Datos Personales – Educación Adventista</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- ── HEADER (Modern & Clean) ── -->
+  <header>
+    <div class="header-inner">
+      <a class="logo-group" href="#">
+        <svg class="logo-icon" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="21" r="21" fill="#1a4a8a"/>
+          <path d="M21 8 L21 34 M10 21 L32 21" stroke="#f5a623" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="21" cy="21" r="7" stroke="white" stroke-width="1.6" fill="none"/>
+        </svg>
+        <div class="logo-text">
+          <strong>Educación Adventista</strong>
+          <span>Más que enseñanza</span>
+        </div>
+      </a>
+      <div class="header-badge">Privacidad Segura</div>
+    </div>
+  </header>
+
+  <!-- ── HERO (Warm & Inviting) ── -->
+  <section class="hero hero-warm">
+    <div class="hero-inner">
+      <div class="hero-chip">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d9e5c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Tu confianza es nuestra prioridad
+      </div>
+      <h1>Únete a nuestra Red de <br/><em>Educación Adventista</em></h1>
+      <p>Valoramos tu privacidad y cuidamos tus datos como parte de nuestra gran familia educativa. Conoce el tratamiento de tu información y autoriza para continuar.</p>
+    </div>
+  </section>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- Barra de progreso visual -->
+    <div class="progress-bar-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 25%;"></div></div>
+      <div class="progress-label" id="progressLabel">Paso 1: Identificación de Datos</div>
+    </div>
+
+    <!-- Sección de Privacidad (Opcional pero accesible) -->
+    <div class="card sutil" id="cardPrivacy">
+      <div class="card-header" onclick="toggleCard('cardPrivacy')">
+        <div class="card-header-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="card-header-title">
+          <h2>Información sobre Privacidad</h2>
+          <p>Haz clic para leer los detalles legales (Opcional)</p>
+        </div>
+        <div class="card-chevron"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="mini-policy-grid">
+            <div class="policy-bullet">
+               <strong>Responsable:</strong> Red de Educación Adventista del Ecuador.
+            </div>
+            <div class="policy-bullet">
+               <strong>Protección:</strong> Cifrado SSL y cumplimiento íntegro de la LOPDP.
+            </div>
+            <div class="policy-bullet">
+               <strong>Derechos:</strong> Puedes acceder, rectificar o eliminar tus datos en cualquier momento.
+            </div>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--gray-400); margin-top: 15px;">Para consultas extendidas escribe a: <em>datos@educacionadventista.edu.ec</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FORMULARIO PRINCIPAL ── -->
+    <div class="consent-form-wrap" id="consentFormSection">
+      <div class="consent-form-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <div>
+          <h2>Consentimiento de Admisión</h2>
+          <p>Completa los campos marcados con (*) para continuar</p>
+        </div>
+      </div>
+      <div class="consent-form-body">
+        <form id="consentForm">
+          <div class="form-row">
+            <div class="form-group full">
+              <label for="nombreRepresentante">Nombre Completo del Representante <span class="req">*</span></label>
+              <input type="text" id="nombreRepresentante" placeholder="Ej: Juan Pérez" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Correo Electrónico <span class="req">*</span></label>
+              <input type="email" id="email" placeholder="ejemplo@correo.com" required />
+            </div>
+            <div class="form-group">
+              <label for="gradoInteres">Grado de Interés <span class="req">*</span></label>
+              <select id="gradoInteres" required>
+                <option value="" disabled selected>Selecciona una opción…</option>
+                <option value="Preescolar">Preescolar</option>
+                <option value="Primaria">Primaria</option>
+                <option value="Secundaria">Secundaria</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Consentimiento Visual -->
+          <div class="consent-checks">
+            <label class="check-item check-required" id="chkWrap1">
+              <input type="checkbox" id="chk1" onchange="updateProgress()" required />
+              <div class="custom-check">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="check-text">
+                <strong>Autorizo el tratamiento de mis datos personales</strong>
+                <span>He sido informado sobre las políticas de privacidad y seguridad de la información.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Envío Final -->
+          <div class="submit-row">
+            <div class="submit-note">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Servidor Seguro (SSL)
+            </div>
+            <button type="submit" class="btn-submit" id="btnSubmit" disabled>
+              <span class="btn-text" style="display:flex;align-items:center;gap:10px;">
+                Aceptar y Continuar
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Éxito Amigable -->
+    <div id="successPanel">
+      <div class="success-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>¡Todo listo!</h2>
+      <p>Gracias por tu confianza. Hemos registrado tu consentimiento en nuestra red de admisiones.</p>
+      <div class="success-detail" id="successDetail"></div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>Educación Adventista del Ecuador</strong><br/>
+    Chatbot Admisiones 2026 — Privacidad Protegida<br/>
+    © Todos los derechos reservados
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
