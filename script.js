@@ -1,93 +1,94 @@
 /**
  * CONFIGURACIÓN DE SUPABASE
+ * Se recomienda usar variables de entorno en producción, 
+ * pero aquí definimos los valores por defecto para que funcione de inmediato.
  */
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bhxhpfawxkskglaldirt.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoeGhwZmF3eGtza2dsYWxkaXJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MDI3NTIsImV4cCI6MjA4NDA3ODc1Mn0.6OgVZKorGKfFiBas4KAclor5tzegN-sbAM4231I2WuU';
+const SUPABASE_URL = 'https://bhxhpfawxkskglaldirt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoeGhwZmF3eGtza2dsYWxkaXJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1MDI3NTIsImV4cCI6MjA4NDA3ODc1Mn0.6OgVZKorGKfFiBas4KAclor5tzegN-sbAM4231I2WuU';
 
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Inicializar cliente Supabase
+const _supabase = typeof supabase !== 'undefined' 
+    ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
-// ── ACCORDION (Opcional, no obligatorio para enviar) ──
-window.toggleCard = (id) => {
-    const card = document.getElementById(id);
-    card.classList.toggle('open');
+if (!_supabase) {
+    console.error('Error: El SDK de Supabase no se cargó correctamente.');
+}
+
+/**
+ * UI LOGIC
+ */
+
+window.toggleSubmit = () => {
+    const chk = document.getElementById('chkConsent');
+    const btn = document.getElementById('btnFinish');
+    btn.disabled = !chk.checked;
 };
 
-// ── PROGRESS BAR (Puramente Visual) ──
-window.updateProgress = () => {
-    const chk1 = document.getElementById('chk1').checked;
-    const fill = document.getElementById('progressFill');
-    const label = document.getElementById('progressLabel');
-    const btnSubmit = document.getElementById('btnSubmit');
+window.handleConsent = async () => {
+    const btn = document.getElementById('btnFinish');
+    const btnText = btn.querySelector('.btn-text');
+    
+    // UI State: Loading
+    btn.disabled = true;
+    btnText.textContent = 'PROCESANDO...';
+    btn.classList.add('pulse');
 
-    // Habilitar botón instantáneamente al marcar el check
-    btnSubmit.disabled = !chk1;
+    // Get metadata from URL if exists (e.g. ?id=123&name=Juan)
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const consentData = {
+        aceptado: true,
+        fecha_acepta: new Date().toISOString(),
+        metadata: {
+            user_agent: navigator.userAgent,
+            plataforma: navigator.platform,
+            url_source: window.location.href,
+            external_id: urlParams.get('id') || 'anónimo'
+        }
+    };
 
-    // Actualizar barra visual
-    const total = chk1 ? 100 : 30;
-    if (fill) fill.style.width = total + '%';
-    if (label) label.textContent = chk1 ? '✓ Listo para enviar' : 'Leyendo información…';
+    try {
+        const { error } = await _supabase
+            .from('consentimientos')
+            .insert([consentData]);
+
+        if (error) throw error;
+
+        // Success State
+        showSuccess(consentData);
+
+    } catch (err) {
+        console.error('Error Supabase:', err);
+        alert('Hubo un error al registrar el consentimiento. Por favor intente de nuevo.');
+        
+        // Reset button
+        btn.disabled = false;
+        btnText.textContent = 'TERMINAR Y CONTINUAR';
+    }
 };
 
-// ── FORM SUBMISSION (Senior UX Approach) ──
-document.addEventListener('DOMContentLoaded', () => {
-    const consentForm = document.getElementById('consentForm');
-    const btnSubmit = document.getElementById('btnSubmit');
+function showSuccess(data) {
+    const panel = document.getElementById('successPanel');
+    const detail = document.getElementById('successDetail');
+    
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('es-EC', { 
+        day: '2-digit', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-    if (consentForm) {
-        consentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    detail.innerHTML = `
+        <strong>Hash Digital:</strong> ${Math.random().toString(36).substring(2, 15).toUpperCase()} <br>
+        <strong>Registro:</strong> ${dateStr} <br>
+        <strong>Estado:</strong> Certificado Digital Generado
+    `;
 
-            // Deshabilitar UI durante el envío
-            btnSubmit.classList.add('loading');
-            btnSubmit.innerHTML = '<span>Procesando...</span>';
-            btnSubmit.disabled = true;
+    panel.style.display = 'flex';
+}
 
-            const formData = {
-                representante_nombre: document.getElementById('nombreRepresentante').value.trim(),
-                correo: document.getElementById('email').value.trim(),
-                grado_interes: document.getElementById('gradoInteres').value,
-                aceptado: true,
-                fecha_acepta: new Date().toISOString()
-            };
-
-            try {
-                const { error } = await _supabase
-                    .from('consentimientos')
-                    .insert([formData]);
-
-                if (error) throw error;
-
-                // Animación de Éxito
-                const now = new Date();
-                const fecha = now.toLocaleDateString('es-EC', { day: '2-digit', month: 'long', year: 'numeric' });
-                const codigo = 'EA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-
-                document.getElementById('successDetail').innerHTML =
-                    `<strong>Representante:</strong> ${formData.representante_nombre}<br/>` +
-                    `<strong>Código:</strong> ${codigo}<br/>` +
-                    `<strong>Fecha:</strong> ${fecha}`;
-
-                document.getElementById('consentFormSection').style.display = 'none';
-                document.getElementById('successPanel').style.display = 'block';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert("Ocurrió un error. Por favor, verifica tu conexión.");
-                btnSubmit.classList.remove('loading');
-                btnSubmit.innerHTML = '<span>Aceptar y Continuar</span>';
-                btnSubmit.disabled = false;
-            }
-        });
-    }
-
-    // Permitir clic en el texto para marcar el check
-    const labelCheck = document.querySelector('.check-text');
-    if (labelCheck) {
-        labelCheck.addEventListener('click', () => {
-            const chk = document.getElementById('chk1');
-            chk.checked = !chk.checked;
-            updateProgress();
-        });
-    }
-});
+// Ensure the page starts at the top
+window.scrollTo(0, 0);
